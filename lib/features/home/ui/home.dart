@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutterbloc/features/home/ui/product_tile_widget.dart';
 import '../../../constants/colors.dart';
 import '../../cart/ui/cart.dart';
 import '../../wishlist/ui/wishlist.dart';
@@ -33,6 +34,32 @@ class _HomeState extends State<Home> {
         } else if (state is HomeNavigateToWishlistPageActionState) {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Wishlist()));
+        } else if (state is HomeProductItemsCartActionState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: gold,
+              content: Text(
+                'Added in the cart',
+                style: TextStyle(
+                  color: black,
+                ),
+              ),
+            ),
+          );
+        } else if (state is HomeProductItemWishlistedActionState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: royalBlue,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                'Added in the Wishlist',
+                style: TextStyle(
+                  color: white,
+                ),
+              ),
+            ),
+          );
         }
       },
       builder: (context, state) {
@@ -44,6 +71,7 @@ class _HomeState extends State<Home> {
               ),
             );
           case HomeLoadedSuccessState:
+            final successState = state as HomeLoadedSuccessState;
             return Scaffold(
               appBar: AppBar(
                 iconTheme: IconThemeData(
@@ -74,6 +102,14 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
+              body: ListView.builder(
+                  itemCount: successState.products.length,
+                  itemBuilder: (context, index) {
+                    return ProductTileWidget(
+                      productDataModel: successState.products[index],
+                      homeBloc: homeBloc,
+                    );
+                  }),
             );
 
           case HomeErrorState:
